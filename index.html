@@ -454,15 +454,12 @@
                     return;
                 }
 
-                const oldUsername = state.username;
-                
                 // 1. Update state (username)
                 updateState({ username: newAdminName });
                 
-                // 2. Send system announcement ke semua user
-                sendBotMessage(`[Pemberitahuan] Akun ${oldUsername} kini telah diidentifikasi sebagai **${newAdminName}**.`);
-                
-                // 3. Notifikasi pribadi
+                // PEMBERITAHUAN PUBLIK DIHAPUS SESUAI PERMINTAAN PENGGUNA
+
+                // 2. Notifikasi pribadi (ini tetap dipertahankan)
                 setNotification(`Selamat! Nama Anda telah diperbarui menjadi ${newAdminName}.`, 5000);
                 return; // Berhenti tanpa mengirim kode sebagai pesan chat
             }

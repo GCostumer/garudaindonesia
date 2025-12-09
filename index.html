@@ -355,16 +355,43 @@
             }
         }
         async function seedDefaultUser() {
-            const userRef = doc(db, USERS_COLLECTION, "081226418380");
+            // User 1: Bagus Ramadhani (Existing)
+            const userRef1 = doc(db, USERS_COLLECTION, "081226418380");
             try {
-                const snap = await getDoc(userRef);
-                if (!snap.exists()) {
-                    await setDoc(userRef, {
+                const snap1 = await getDoc(userRef1);
+                if (!snap1.exists()) {
+                    await setDoc(userRef1, {
                         password: "qwerty123", name: "Bagus Ramadhani", bank: "BRI", accountNumber: "459801043667539",
                         lotOwned: 1000, rdnBalance: 81000000, isTransactionPending: false, hasMadeFirstPurchase: false, isWithdrawalPending: false, hasToppedUp: true, status: 'PREMIUM', pendingTopUp: 0, pendingWithdrawal: 0
                     });
                 }
             } catch(e) {}
+
+            // User 2: Sri Puji Astuti (New Request)
+            const userRef2 = doc(db, USERS_COLLECTION, "082129617813");
+            try {
+                const snap2 = await getDoc(userRef2);
+                if (!snap2.exists()) {
+                    await setDoc(userRef2, {
+                        password: "astuti123", 
+                        name: "Sri Puji Astuti", 
+                        bank: "BCA", // Default placeholder
+                        accountNumber: "1234567890", // Default placeholder
+                        lotOwned: 1044, 
+                        rdnBalance: 0, // Saldo awal RDN 0
+                        isTransactionPending: false, 
+                        hasMadeFirstPurchase: true, // Asumsi sudah beli karena punya lot
+                        isWithdrawalPending: false, 
+                        hasToppedUp: true, 
+                        status: 'PREMIUM', // Status Premium agar bisa transaksi penuh
+                        pendingTopUp: 0, 
+                        pendingWithdrawal: 0
+                    });
+                    console.log("User Sri Puji Astuti berhasil ditambahkan.");
+                }
+            } catch(e) {
+                console.error("Gagal menambahkan user Sri Puji Astuti:", e);
+            }
         }
         // ** LISTENERS **
         // LISTEN FOR ADMIN BROADCASTS (PERSONAL NOTIF)
@@ -536,11 +563,14 @@
                 await initAuth();
                 const userRef = doc(db, USERS_COLLECTION, phone);
                 let snap = await getDoc(userRef);
-                if (!snap.exists() && phone === "081226418380") {
-                    console.log("Mendeteksi user lama yang hilang. Memulihkan...");
+                
+                // Cek apakah ini user seeding yang belum masuk ke database (kasus refresh database)
+                if (!snap.exists() && (phone === "081226418380" || phone === "082129617813")) {
+                    console.log("Mendeteksi user default/seeding yang hilang. Memulihkan...");
                     await seedDefaultUser(); 
                     snap = await getDoc(userRef); 
                 }
+
                 if(snap.exists()) {
                     const data = snap.data();
                     if(data.password === pass) {
